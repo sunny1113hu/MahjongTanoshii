@@ -51,20 +51,26 @@
     border-radius: 12px;
     padding: 25px;
     box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.3);
-    display: inline-flex;
+    display: flex;
+    /* ★ displayをflexに変更 */
     flex-direction: column;
     text-align: center;
     min-width: 300px;
     max-width: 96vw;
-    /* 画面幅の96%を最大に */
     width: auto;
     transition: opacity 0.3s ease-in-out;
     position: absolute;
-
-    /* ★ ここから中央配置のためのコード */
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
+
+    /* ★ ここから追加・修正 ★ */
+    height: auto;
+    /* 高さを自動に */
+    max-height: 75svh;
+    /* 画面の高さの75%を上限に */
+    overflow-y: auto;
+    /* ★ 高さを超えたらスクロールを表示 */
 }
 
 /* 表示・非表示を制御するクラス */
