@@ -55,8 +55,8 @@
     flex-direction: column;
     text-align: center;
     min-width: 300px;
-    max-width: 90vw;
-    /* 画面幅の90%を最大に */
+    max-width: 96vw;
+    /* 画面幅の96%を最大に */
     width: auto;
     transition: opacity 0.3s ease-in-out;
     position: absolute;
