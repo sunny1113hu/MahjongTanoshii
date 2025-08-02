@@ -89,25 +89,28 @@ export default function Home() {
 
         {phase === 'showingTweet' && currentTweet && (
           <div className={`${styles.tweetDisplay} ${styles.visible}`}>
-            <p className={styles.tweetText}>{currentTweet.text}</p>
+            {/* ★ このdivを一つ追加する */}
+            <div className={styles.tweetContent}>
+              <p className={styles.tweetText}>{currentTweet.text}</p>
 
-            {currentTweet.images && currentTweet.images.length > 0 ? (
-              currentTweet.images.map((img) => (
-                <img
-                  key={img.url}
-                  src={img.url}
-                  alt="ツイート画像"
-                  className={styles.tweetImage}
-                />
-              ))
-            ) :
-              currentTweet.image ? (
-                <img
-                  src={currentTweet.image.url}
-                  alt="ツイート画像"
-                  className={styles.tweetImage}
-                />
-              ) : null}
+              {currentTweet.images && currentTweet.images.length > 0 ? (
+                currentTweet.images.map((img) => (
+                  <img
+                    key={img.url}
+                    src={img.url}
+                    alt="ツイート画像"
+                    className={styles.tweetImage}
+                  />
+                ))
+              ) :
+                currentTweet.image ? (
+                  <img
+                    src={currentTweet.image.url}
+                    alt="ツイート画像"
+                    className={styles.tweetImage}
+                  />
+                ) : null}
+            </div>
           </div>
         )}
       </div>
