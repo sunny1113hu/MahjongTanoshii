@@ -1,103 +1,91 @@
-import Image from "next/image";
+"use client"; // ← これが重要！インタラクティブなページにするための宣言
+
+import { useState, useEffect } from "react";
+import { client } from "../libs/client";
+
+// Tweetの型定義（前回と同じ）
+type Tweet = {
+  id: string;
+  text: string;
+  image?: {
+    url: string;
+  };
+};
+
+type ApiResponse = {
+  contents: Tweet[];
+};
 
 export default function Home() {
-  return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  // すべてのツイートを保持する場所
+  const [allTweets, setAllTweets] = useState<Tweet[]>([]);
+  // 現在表示しているツイートを保持する場所
+  const [currentTweet, setCurrentTweet] = useState<Tweet | null>(null);
+  // ローディング状態を管理する場所
+  const [isLoading, setIsLoading] = useState(true);
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+  // 最初に1回だけmicroCMSから全データを取得する
+  useEffect(() => {
+    client.get<ApiResponse>({ endpoint: "tweets" })
+      .then((data) => {
+        setAllTweets(data.contents);
+        // 最初のツイートをランダムに選んで表示
+        if (data.contents.length > 0) {
+          const randomIndex = Math.floor(Math.random() * data.contents.length);
+          setCurrentTweet(data.contents[randomIndex]);
+        }
+      })
+      .catch((err) => console.error(err))
+      .finally(() => setIsLoading(false));
+  }, []); // 空の配列は「最初の一度だけ実行する」という意味
+
+  // ガチャを引くための関数
+  const drawTweet = () => {
+    if (allTweets.length === 0) return; // ツイートがなければ何もしない
+    const randomIndex = Math.floor(Math.random() * allTweets.length);
+    setCurrentTweet(allTweets[randomIndex]);
+  };
+
+  return (
+    <div style={{ maxWidth: '600px', margin: '40px auto', padding: '0 20px', textAlign: 'center' }}>
+      <h1>ツイートガチャ</h1>
+      
+      {/* メインのガチャ表示エリア */}
+      <div style={{ minHeight: '250px', border: '2px solid #eee', borderRadius: '12px', padding: '20px', marginBottom: '30px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        {isLoading ? (
+          <p>読み込み中...</p>
+        ) : currentTweet ? (
+          <div>
+            <p style={{ fontSize: '1.2rem', lineHeight: '1.6' }}>{currentTweet.text}</p>
+            {currentTweet.image && (
+              <img 
+                src={currentTweet.image.url} 
+                alt="ツイート画像" 
+                style={{ maxWidth: '100%', height: 'auto', marginTop: '16px', borderRadius: '8px' }}
+              />
+            )}
+          </div>
+        ) : (
+          <p>ツイートがありません。</p>
+        )}
+      </div>
+
+      {/* ガチャを引くボタン */}
+      <button 
+        onClick={drawTweet}
+        style={{
+          padding: '15px 40px',
+          fontSize: '1.1rem',
+          fontWeight: 'bold',
+          color: 'white',
+          backgroundColor: '#1DA1F2', // Twitter風のカラー
+          border: 'none',
+          borderRadius: '9999px',
+          cursor: 'pointer'
+        }}
+      >
+        もう一回引く
+      </button>
     </div>
   );
 }
