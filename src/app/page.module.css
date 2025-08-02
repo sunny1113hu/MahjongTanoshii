@@ -22,16 +22,16 @@
 }
 
 .displayArea {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 90%;
+    width: 100%;
+    /* 横幅いっぱいに広げる */
     min-height: 350px;
     z-index: 10;
     padding: 20px 0;
+    position: relative;
+    /* 子要素を絶対配置する基準 */
+    /* display: flexなどは不要になります */
 }
 
-/* ★ 初期表示＆ツモるたびに表示される牌 */
 .initialTile {
     background: linear-gradient(to bottom, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0.0) 30%), #F8B62D;
     box-shadow: inset 0 0 4px 2px rgba(0, 0, 0, 0.1), 5px 5px 15px rgba(0, 0, 0, 0.3);
@@ -39,9 +39,12 @@
     aspect-ratio: 19.5 / 26;
     width: 200px;
     position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    /* ★ この一行を追加 */
 }
 
-/* ★ ツイート表示フィールド */
 .tweetDisplay {
     background-color: #F0F0E0;
     border: 5px solid #F0F0E0;
@@ -52,14 +55,16 @@
     flex-direction: column;
     text-align: center;
     min-width: 300px;
-    max-width: 600px;
+    max-width: 90vw;
+    /* 画面幅の90%を最大に */
     width: auto;
     transition: opacity 0.3s ease-in-out;
     position: absolute;
-    min-height: 150px;
-    /* ★ 最低限の高さを設定 */
-    justify-content: center;
-    /* ★ 中身を上下中央揃えに */
+
+    /* ★ ここから中央配置のためのコード */
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
 }
 
 /* 表示・非表示を制御するクラス */
@@ -100,22 +105,22 @@
 
 @keyframes draw-in {
     0% {
-        transform: translateX(150%);
+        transform: translate(-50%, -50%) translateX(150%);
         opacity: 0;
     }
 
     30% {
-        transform: translateX(0);
+        transform: translate(-50%, -50%) translateX(0);
         opacity: 1;
     }
 
     80% {
-        transform: translateX(0);
+        transform: translate(-50%, -50%) translateX(0);
         opacity: 1;
     }
 
     100% {
-        transform: translateX(0);
+        transform: translate(-50%, -50%) translateX(0);
         opacity: 0;
     }
 }
