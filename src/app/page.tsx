@@ -4,9 +4,17 @@ import { useState, useEffect } from "react";
 import { client } from "../libs/client";
 import styles from "./page.module.css";
 
-// 型定義は変更なし
-type Tweet = { id: string; text: string; image?: { url: string }; };
-type ApiResponse = { contents: Tweet[]; };
+type Tweet = {
+  id: string;
+  text: string;
+  image?: { url: string };
+  images?: { url: string }[];
+};
+
+type ApiResponse = {
+  contents: Tweet[];
+  totalCount: number; // totalCountを追加
+};
 
 type Phase = 'initial' | 'animating' | 'showingTweet';
 
@@ -17,26 +25,54 @@ export default function Home() {
   const [phase, setPhase] = useState<Phase>('initial');
 
   useEffect(() => {
-    client.get<ApiResponse>({ endpoint: "tweets" })
-      .then((data) => {
-        setAllTweets(data.contents);
-      })
-      .catch((err) => console.error(err))
-      .finally(() => setIsLoading(false));
+    const fetchAllTweets = async () => {
+      try {
+        // まずは件数だけを取得
+        const res = await client.get<ApiResponse>({
+          endpoint: "tweets",
+          queries: { fields: 'id', limit: 0 } // fields指定で軽量化
+        });
+        const totalCount = res.totalCount;
+        const limit = 100; // 1回あたりの取得件数（最大値）
+
+        // 必要なリクエスト回数分の配列を作成
+        const numRequests = Math.ceil(totalCount / limit);
+        const requests = [...Array(numRequests)].map((_, i) => {
+          return client.get<ApiResponse>({
+            endpoint: "tweets",
+            queries: { offset: i * limit, limit: limit }
+          });
+        });
+
+        // 全てのリクエストを並行して実行
+        const responses = await Promise.all(requests);
+
+        // 全てのレスポンスからツイート本体だけを取り出して一つの配列にまとめる
+        const allContents = responses.flatMap(res => res.contents);
+        setAllTweets(allContents);
+
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchAllTweets();
   }, []);
 
   const drawTweet = () => {
     if (phase === 'animating' || allTweets.length === 0) return;
 
     setPhase('animating');
-    
+
     const randomIndex = Math.floor(Math.random() * allTweets.length);
     const newTweet = allTweets[randomIndex];
 
     setTimeout(() => {
       setCurrentTweet(newTweet);
       setPhase('showingTweet');
-    }, 1200); // アニメーション時間
+    }, 1200);
   };
 
   return (
@@ -44,32 +80,44 @@ export default function Home() {
       <h1 className={styles.title}>麻雀たのしいガチャ</h1>
 
       <div className={styles.displayArea}>
-        {/* initial または animating フェーズでは、裏向きの牌を表示 */}
-        {/* ★ keyを追加してアニメーションを毎回リセット */}
         {phase !== 'showingTweet' && !isLoading && (
-          <div 
-            key={Date.now()} 
-            className={`${styles.initialTile} ${phase === 'animating' ? styles.tileAnimating : ''}`} 
+          <div
+            key={Date.now()}
+            className={`${styles.initialTile} ${phase === 'animating' ? styles.tileAnimating : ''}`}
           />
         )}
-        
-        {/* showingTweet フェーズでのみ、ツイートを表示 */}
+
         {phase === 'showingTweet' && currentTweet && (
           <div className={`${styles.tweetDisplay} ${styles.visible}`}>
             <p className={styles.tweetText}>{currentTweet.text}</p>
-            {currentTweet.image && (
-              <img
-                src={currentTweet.image.url}
-                alt="ツイート画像"
-                className={styles.tweetImage}
-              />
-            )}
+
+            {currentTweet.images && currentTweet.images.length > 0 ? (
+              currentTweet.images.map((img) => (
+                <img
+                  key={img.url}
+                  src={img.url}
+                  alt="ツイート画像"
+                  className={styles.tweetImage}
+                />
+              ))
+            ) :
+              currentTweet.image ? (
+                <img
+                  src={currentTweet.image.url}
+                  alt="ツイート画像"
+                  className={styles.tweetImage}
+                />
+              ) : null}
           </div>
         )}
       </div>
 
       <button onClick={drawTweet} className={styles.tsumoButton} disabled={phase === 'animating' || isLoading}>
-        {isLoading ? "準備中..." : (phase === 'animating' ? "ツモり中..." : "ツモる")}
+        {isLoading ? (
+          <>
+            <span className={styles.loader}></span>準備中...
+          </>
+        ) : (phase === 'animating' ? "ツモり中..." : "ツモる")}
       </button>
     </main>
   );

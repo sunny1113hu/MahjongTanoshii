@@ -1,138 +1,164 @@
 /* page.module.css */
 
 .mahjongTable {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: space-around;
-  min-height: 100vh;
-  padding: 20px;
-  position: relative;
-  overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-around;
+    min-height: 100vh;
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
 }
 
 .title {
-  font-size: 2.5rem;
-  color: white;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-  z-index: 10;
-  flex-shrink: 0;
+    font-size: 2.5rem;
+    color: white;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    z-index: 10;
+    flex-shrink: 0;
 }
 
 .displayArea {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 90%;
-  min-height: 350px;
-  z-index: 10;
-  padding: 20px 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 90%;
+    min-height: 350px;
+    z-index: 10;
+    padding: 20px 0;
 }
 
 /* ★ 初期表示＆ツモるたびに表示される牌 */
 .initialTile {
-  background: linear-gradient( to bottom, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0.0) 30% ), #F8B62D;
-  box-shadow: inset 0 0 4px 2px rgba(0,0,0,0.1), 5px 5px 15px rgba(0,0,0,0.3);
-  border-radius: 12px;
-  aspect-ratio: 19.5 / 26;
-  width: 200px;
-  position: absolute;
+    background: linear-gradient(to bottom, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0.0) 30%), #F8B62D;
+    box-shadow: inset 0 0 4px 2px rgba(0, 0, 0, 0.1), 5px 5px 15px rgba(0, 0, 0, 0.3);
+    border-radius: 12px;
+    aspect-ratio: 19.5 / 26;
+    width: 200px;
+    position: absolute;
 }
 
 /* ★ ツイート表示フィールド */
 .tweetDisplay {
-  background-color: #F0F0E0;
-  border: 5px solid #F0F0E0;
-  border-radius: 12px;
-  padding: 25px;
-  box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.3);
-  display: inline-flex;
-  flex-direction: column;
-  text-align: center;
-  min-width: 300px;
-  max-width: 600px;
-  width: auto;
-  transition: opacity 0.3s ease-in-out;
-  position: absolute;
+    background-color: #F0F0E0;
+    border: 5px solid #F0F0E0;
+    border-radius: 12px;
+    padding: 25px;
+    box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.3);
+    display: inline-flex;
+    flex-direction: column;
+    text-align: center;
+    min-width: 300px;
+    max-width: 600px;
+    width: auto;
+    transition: opacity 0.3s ease-in-out;
+    position: absolute;
+    min-height: 150px;
+    /* ★ 最低限の高さを設定 */
+    justify-content: center;
+    /* ★ 中身を上下中央揃えに */
 }
 
 /* 表示・非表示を制御するクラス */
 .visible {
-  opacity: 1;
+    opacity: 1;
 }
+
 .hidden {
-  opacity: 0;
-  pointer-events: none;
+    opacity: 0;
+    pointer-events: none;
 }
 
 .tweetText {
-  font-size: 18px;
-  line-height: 1.7;
-  white-space: pre-wrap;
-  color: #222;
-  text-align: center;
-  width: 100%;
-  overflow-y: auto;
-  flex-shrink: 1;
-  min-height: 0;
+    font-size: 18px;
+    line-height: 1.7;
+    white-space: pre-wrap;
+    color: #222;
+    text-align: center;
+    width: 100%;
+    overflow-y: auto;
+    flex-shrink: 1;
+    min-height: 0;
 }
 
 .tweetImage {
-  width: 100%;
-  height: auto;
-  max-height: 400px;
-  margin-top: 15px;
-  border-radius: 8px;
-  object-fit: contain;
+    width: 100%;
+    height: auto;
+    max-height: 400px;
+    margin-top: 15px;
+    border-radius: 8px;
+    object-fit: contain;
 }
 
 /* ★ 手のアニメーションを削除し、新しい牌のアニメーションに変更 */
 .tileAnimating {
-  animation: draw-in 1.2s ease-out forwards;
+    animation: draw-in 1.2s ease-out forwards;
 }
 
 @keyframes draw-in {
-  0% {
-    transform: translateX(150%);
-    opacity: 0;
-  }
-  30% {
-    transform: translateX(0);
-    opacity: 1;
-  }
-  80% {
-    transform: translateX(0);
-    opacity: 1;
-  }
-  100% {
-    transform: translateX(0);
-    opacity: 0;
-  }
+    0% {
+        transform: translateX(150%);
+        opacity: 0;
+    }
+
+    30% {
+        transform: translateX(0);
+        opacity: 1;
+    }
+
+    80% {
+        transform: translateX(0);
+        opacity: 1;
+    }
+
+    100% {
+        transform: translateX(0);
+        opacity: 0;
+    }
 }
 
 .tsumoButton {
-  background-color: #F0F0E0;
-  color: #C0392B;
-  font-family: 'Noto Sans JP', sans-serif;
-  font-size: 1.5rem;
-  font-weight: 700;
-  padding: 15px 40px;
-  border: 5px solid #333;
-  border-radius: 12px;
-  box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.2);
-  cursor: pointer;
-  transition: all 0.2s ease;
-  z-index: 10;
-  flex-shrink: 0;
-  margin-top: 20px;
+    background-color: #F0F0E0;
+    color: #C0392B;
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+    padding: 15px 40px;
+    border: 5px solid #333;
+    border-radius: 12px;
+    box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    z-index: 10;
+    flex-shrink: 0;
+    margin-top: 20px;
 }
 
 .tsumoButton:hover {
-  transform: translateY(-2px);
-  box-shadow: 7px 7px 20px rgba(0, 0, 0, 0.3);
+    transform: translateY(-2px);
+    box-shadow: 7px 7px 20px rgba(0, 0, 0, 0.3);
 }
 
 .tsumoButton:active {
-  transform: translateY(1px);
-  box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);
+    transform: translateY(1px);
+    box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);
+}
+
+.loader {
+    width: 1em;
+    height: 1em;
+    border-radius: 50%;
+    border: 2px solid #fff;
+    border-top-color: #C0392B;
+    /* ボタンの文字色 */
+    animation: spin 1s linear infinite;
+    display: inline-block;
+    margin-right: 8px;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
 }
