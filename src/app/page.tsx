@@ -49,18 +49,24 @@ export default function Home() {
   return (
     <div style={{ maxWidth: '600px', margin: '40px auto', padding: '0 20px', textAlign: 'center' }}>
       <h1>ツイートガチャ</h1>
-      
+
       {/* メインのガチャ表示エリア */}
       <div style={{ minHeight: '250px', border: '2px solid #eee', borderRadius: '12px', padding: '20px', marginBottom: '30px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         {isLoading ? (
           <p>読み込み中...</p>
         ) : currentTweet ? (
           <div>
-            <p style={{ fontSize: '1.2rem', lineHeight: '1.6' }}>{currentTweet.text}</p>
+            <p style={{
+              fontSize: '1.2rem',
+              lineHeight: '1.6',
+              whiteSpace: 'pre-wrap'
+            }}>
+              {currentTweet.text}
+            </p>
             {currentTweet.image && (
-              <img 
-                src={currentTweet.image.url} 
-                alt="ツイート画像" 
+              <img
+                src={currentTweet.image.url}
+                alt="ツイート画像"
                 style={{ maxWidth: '100%', height: 'auto', marginTop: '16px', borderRadius: '8px' }}
               />
             )}
@@ -71,7 +77,7 @@ export default function Home() {
       </div>
 
       {/* ガチャを引くボタン */}
-      <button 
+      <button
         onClick={drawTweet}
         style={{
           padding: '15px 40px',
