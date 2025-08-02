@@ -1,21 +1,12 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Image from "next/image";
 import { client } from "../libs/client";
 import styles from "./page.module.css";
 
-type Tweet = {
-  id: string;
-  text: string;
-  image?: {
-    url: string;
-  };
-};
-
-type ApiResponse = {
-  contents: Tweet[];
-};
+// 型定義は変更なし
+type Tweet = { id: string; text: string; image?: { url: string }; };
+type ApiResponse = { contents: Tweet[]; };
 
 type Phase = 'initial' | 'animating' | 'showingTweet';
 
@@ -45,30 +36,24 @@ export default function Home() {
     setTimeout(() => {
       setCurrentTweet(newTweet);
       setPhase('showingTweet');
-    }, 1200);
+    }, 1200); // アニメーション時間
   };
 
   return (
     <main className={styles.mahjongTable}>
       <h1 className={styles.title}>麻雀たのしいガチャ</h1>
 
-      {phase === 'animating' && (
-        <Image
-          src="/hand.png"
-          alt="ツモる手"
-          width={150}
-          height={150}
-          className={`${styles.hand} ${styles.handAnimating}`}
-          priority
-        />
-      )}
-      
       <div className={styles.displayArea}>
         {/* initial または animating フェーズでは、裏向きの牌を表示 */}
-        <div className={`${styles.initialTile} ${phase === 'showingTweet' ? styles.hidden : styles.visible}`} />
+        {/* ★ keyを追加してアニメーションを毎回リセット */}
+        {phase !== 'showingTweet' && !isLoading && (
+          <div 
+            key={Date.now()} 
+            className={`${styles.initialTile} ${phase === 'animating' ? styles.tileAnimating : ''}`} 
+          />
+        )}
         
-        {/* ★★★ ここを修正 ★★★ */}
-        {/* showingTweet フェーズでのみ、ツイート表示エリアの要素全体を描画する */}
+        {/* showingTweet フェーズでのみ、ツイートを表示 */}
         {phase === 'showingTweet' && currentTweet && (
           <div className={`${styles.tweetDisplay} ${styles.visible}`}>
             <p className={styles.tweetText}>{currentTweet.text}</p>
