@@ -5,7 +5,9 @@
     flex-direction: column;
     align-items: center;
     justify-content: space-around;
-    min-height: 100vh;
+    /* ★ min-heightを新しい単位に変更 */
+    min-height: 100svh;
+    /* svh: small viewport height */
     padding: 20px;
     position: relative;
     overflow: hidden;
