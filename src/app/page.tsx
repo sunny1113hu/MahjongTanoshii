@@ -1,9 +1,10 @@
-"use client"; // ← これが重要！インタラクティブなページにするための宣言
+"use client";
 
 import { useState, useEffect } from "react";
+import Image from "next/image";
 import { client } from "../libs/client";
+import styles from "./page.module.css";
 
-// Tweetの型定義（前回と同じ）
 type Tweet = {
   id: string;
   text: string;
@@ -16,82 +17,75 @@ type ApiResponse = {
   contents: Tweet[];
 };
 
-export default function Home() {
-  // すべてのツイートを保持する場所
-  const [allTweets, setAllTweets] = useState<Tweet[]>([]);
-  // 現在表示しているツイートを保持する場所
-  const [currentTweet, setCurrentTweet] = useState<Tweet | null>(null);
-  // ローディング状態を管理する場所
-  const [isLoading, setIsLoading] = useState(true);
+type Phase = 'initial' | 'animating' | 'showingTweet';
 
-  // 最初に1回だけmicroCMSから全データを取得する
+export default function Home() {
+  const [allTweets, setAllTweets] = useState<Tweet[]>([]);
+  const [currentTweet, setCurrentTweet] = useState<Tweet | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [phase, setPhase] = useState<Phase>('initial');
+
   useEffect(() => {
     client.get<ApiResponse>({ endpoint: "tweets" })
       .then((data) => {
         setAllTweets(data.contents);
-        // 最初のツイートをランダムに選んで表示
-        if (data.contents.length > 0) {
-          const randomIndex = Math.floor(Math.random() * data.contents.length);
-          setCurrentTweet(data.contents[randomIndex]);
-        }
       })
       .catch((err) => console.error(err))
       .finally(() => setIsLoading(false));
-  }, []); // 空の配列は「最初の一度だけ実行する」という意味
+  }, []);
 
-  // ガチャを引くための関数
   const drawTweet = () => {
-    if (allTweets.length === 0) return; // ツイートがなければ何もしない
+    if (phase === 'animating' || allTweets.length === 0) return;
+
+    setPhase('animating');
+    
     const randomIndex = Math.floor(Math.random() * allTweets.length);
-    setCurrentTweet(allTweets[randomIndex]);
+    const newTweet = allTweets[randomIndex];
+
+    setTimeout(() => {
+      setCurrentTweet(newTweet);
+      setPhase('showingTweet');
+    }, 1200);
   };
 
   return (
-    <div style={{ maxWidth: '600px', margin: '40px auto', padding: '0 20px', textAlign: 'center' }}>
-      <h1>ツイートガチャ</h1>
+    <main className={styles.mahjongTable}>
+      <h1 className={styles.title}>麻雀たのしいガチャ</h1>
 
-      {/* メインのガチャ表示エリア */}
-      <div style={{ minHeight: '250px', border: '2px solid #eee', borderRadius: '12px', padding: '20px', marginBottom: '30px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        {isLoading ? (
-          <p>読み込み中...</p>
-        ) : currentTweet ? (
-          <div>
-            <p style={{
-              fontSize: '1.2rem',
-              lineHeight: '1.6',
-              whiteSpace: 'pre-wrap'
-            }}>
-              {currentTweet.text}
-            </p>
+      {phase === 'animating' && (
+        <Image
+          src="/hand.png"
+          alt="ツモる手"
+          width={150}
+          height={150}
+          className={`${styles.hand} ${styles.handAnimating}`}
+          priority
+        />
+      )}
+      
+      <div className={styles.displayArea}>
+        {/* initial または animating フェーズでは、裏向きの牌を表示 */}
+        <div className={`${styles.initialTile} ${phase === 'showingTweet' ? styles.hidden : styles.visible}`} />
+        
+        {/* ★★★ ここを修正 ★★★ */}
+        {/* showingTweet フェーズでのみ、ツイート表示エリアの要素全体を描画する */}
+        {phase === 'showingTweet' && currentTweet && (
+          <div className={`${styles.tweetDisplay} ${styles.visible}`}>
+            <p className={styles.tweetText}>{currentTweet.text}</p>
             {currentTweet.image && (
               <img
                 src={currentTweet.image.url}
                 alt="ツイート画像"
-                style={{ maxWidth: '100%', height: 'auto', marginTop: '16px', borderRadius: '8px' }}
+                className={styles.tweetImage}
               />
             )}
           </div>
-        ) : (
-          <p>ツイートがありません。</p>
         )}
       </div>
 
-      {/* ガチャを引くボタン */}
-      <button
-        onClick={drawTweet}
-        style={{
-          padding: '15px 40px',
-          fontSize: '1.1rem',
-          fontWeight: 'bold',
-          color: 'white',
-          backgroundColor: '#1DA1F2', // Twitter風のカラー
-          border: 'none',
-          borderRadius: '9999px',
-          cursor: 'pointer'
-        }}
-      >
-        もう一回引く
+      <button onClick={drawTweet} className={styles.tsumoButton} disabled={phase === 'animating' || isLoading}>
+        {isLoading ? "準備中..." : (phase === 'animating' ? "ツモり中..." : "ツモる")}
       </button>
-    </div>
+    </main>
   );
 }

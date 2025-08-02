@@ -1,0 +1,174 @@
+/* page.module.css */
+
+.mahjongTable {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-around;
+    min-height: 100vh;
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+}
+
+.title {
+    font-size: 2.5rem;
+    color: white;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    z-index: 10;
+    flex-shrink: 0;
+}
+
+/* ★ 重ね合わせの基準となるエリア */
+.displayArea {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 90%;
+    min-height: 450px;
+    position: relative;
+    /* ★ ここを基準にする */
+    z-index: 10;
+}
+
+.initialTile {
+    background: linear-gradient(to bottom,
+            rgba(255, 255, 255, 0.4) 0%,
+            rgba(255, 255, 255, 0.0) 30%), #F8B62D;
+
+    /* ★ borderを削除し、insetシャドウで縁を表現 */
+    box-shadow: inset 0 0 4px 2px rgba(0, 0, 0, 0.1), 5px 5px 15px rgba(0, 0, 0, 0.3);
+
+    border-radius: 12px;
+    aspect-ratio: 19.5 / 26;
+    width: 200px;
+    transition: opacity 0.3s ease-in-out;
+    position: absolute;
+}
+
+.tweetDisplay {
+    background-color: #F0F0E0;
+    border: 5px solid #F0F0E0;
+    /* ★ 枠線の色を背景色と同じにする */
+    border-radius: 12px;
+    padding: 25px;
+    box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.3);
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+    min-width: 300px;
+    max-width: 600px;
+    width: auto;
+    transition: opacity 0.3s ease-in-out;
+    position: absolute;
+}
+
+/* 表示・非表示を制御するクラス */
+.visible {
+    opacity: 1;
+}
+
+.hidden {
+    opacity: 0;
+    pointer-events: none;
+    /* 透明な要素がクリックを邪魔しないように */
+}
+
+.tweetText {
+    font-size: 18px;
+    /* ★ サイズをremからpx指定に変更 */
+    line-height: 1.7;
+    /* 行間を少し広げて読みやすく */
+    white-space: pre-wrap;
+    color: #222;
+    text-align: center;
+    /* 中央揃えを追加 */
+    width: 100%;
+    overflow-y: auto;
+    flex-shrink: 1;
+    min-height: 0;
+}
+
+.tweetImage {
+    width: 100%;
+    height: auto;
+    max-height: 400px;
+    margin-top: 15px;
+    border-radius: 8px;
+    object-fit: contain;
+}
+
+/* 手のアニメーション */
+.hand {
+    position: absolute;
+    width: 150px;
+    height: auto;
+    bottom: 25%;
+    right: -150px;
+    z-index: 20;
+    pointer-events: none;
+}
+
+.handAnimating {
+    animation: tsumo-animation 1.2s ease-in-out forwards;
+}
+
+@keyframes tsumo-animation {
+    0% {
+        right: -150px;
+        transform: rotate(0deg);
+    }
+
+    40% {
+        right: 50%;
+        transform: translateX(50%) translateY(-50px) rotate(-10deg);
+    }
+
+    60% {
+        right: 50%;
+        transform: translateX(50%) translateY(-50px) rotate(-10deg);
+    }
+
+    100% {
+        right: 100%;
+        transform: rotate(0deg);
+    }
+}
+
+
+.tsumoButton {
+    background-color: #F0F0E0;
+    color: #C0392B;
+    font-family: inherit;
+    font-size: 1.5rem;
+    font-weight: 700;
+    padding: 15px 40px;
+    border: 5px solid #333;
+    border-radius: 12px;
+    box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    z-index: 10;
+    flex-shrink: 0;
+    margin-top: 20px;
+}
+
+.tsumoButton:hover {
+    transform: translateY(-2px);
+    box-shadow: 7px 7px 20px rgba(0, 0, 0, 0.3);
+}
+
+@media (max-width: 600px) {
+    .title {
+        font-size: 2rem;
+    }
+
+    .tsumoButton {
+        font-size: 1.2rem;
+        padding: 12px 30px;
+    }
+
+    .tweetText {
+        font-size: 16px;
+    }
+}
